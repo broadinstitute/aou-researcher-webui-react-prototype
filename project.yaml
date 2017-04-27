@@ -1,0 +1,5 @@
+namespace: aouwebui
+source_file_paths:
+  - project.clj
+  - src/cljs
+  - src/static/index.html: resources/public/index.html
