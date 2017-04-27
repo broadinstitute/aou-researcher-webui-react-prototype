@@ -5,8 +5,9 @@ unless Dir.exists? ".project/common"
   system(*%W{git clone https://github.com/dmohs/project-management.git .project/common})
 end
 
-require_relative ".project/common/common.rb"
-require_relative ".project/devserver.rb"
+require_relative ".project/common/common"
+require_relative ".project/deploy"
+require_relative ".project/devserver"
 
 c = Common.new
 

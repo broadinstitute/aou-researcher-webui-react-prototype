@@ -13,3 +13,5 @@ RUN mkdir -p /var/log/app_engine
 # to be explicit.
 RUN mkdir -p /usr/share/nginx/www/_ah \
   && echo "healthy" > /usr/share/nginx/www/_ah/health
+
+ADD release/ /usr/share/nginx/www
