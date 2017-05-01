@@ -2,5 +2,5 @@ namespace: aouwebui
 source_file_paths:
   - project.clj
   - src/cljs
-  - src/js/VbCohortBuilder.js : resources/public/VbCohortBuilder.js
-  - src/static/index.html: resources/public/index.html
+static_file_src: src/static
+static_file_dest: resources/public

@@ -16,15 +16,23 @@ def build_for_release()
       lein with-profile deploy cljsbuild once
   }
   at_exit { c.run %W{docker rm -f #{cname}} }
-  # TODO: Take these from env
-  c.run_inline %W{docker cp project.clj #{cname}:/w}
-  c.run_inline %W{docker cp src #{cname}:/w}
+  env.source_file_paths.each do |src_path|
+    c.pipe(
+      %W{tar -c #{src_path}},
+      %W{docker cp - #{cname}:/w}
+    )
+  end
   c.status "Building..."
   c.run_inline %W{docker start -a #{cname}}
   c.status "Copying artifacts..."
   c.run_inline %W{docker cp #{cname}:/w/target/cljsbuild-main.js release/target/compiled.js}
-  # TODO: Take from env
-  c.run_inline %W{cp src/static/index.html release}
+  c.status "Copying static files..."
+  Dir.foreach(env.static_file_src) do |entry|
+    unless entry.start_with?(".")
+      item = "#{env.static_file_src}/#{entry}"
+      c.run_inline %W{cp -R #{item} release}
+    end
+  end
 end
 
 def deploy()
