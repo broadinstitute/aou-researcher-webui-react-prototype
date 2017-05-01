@@ -9,4 +9,4 @@ window.VbCohortBuilder = (function() {
   };
 
   return self;
-})()
+})();

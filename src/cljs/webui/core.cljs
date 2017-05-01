@@ -10,14 +10,14 @@
       [:div {} "Hello World."]
       [:div {:ref "cohort-builder-container" :style {:margin-top "3rem"}}]])
    :component-did-mount
-   (fn [{:keys [refs]}]
+   (fn [{:keys [this]}]
      (let [script (js-invoke js/document "createElement" "script")]
        (js-invoke script "setAttribute" "src" "VbCohortBuilder.js")
-       (js-invoke (aget js/document "body") "appendChild" script)
-       (js/setTimeout
-        #(js-invoke (aget js/window "VbCohortBuilder")
-                    "render" (@refs "cohort-builder-container"))
-        100)))})
+       (aset script "onload" #(this :-handle-cohort-builder-loaded))
+       (js-invoke (aget js/document "body") "appendChild" script)))
+   :-handle-cohort-builder-loaded
+   (fn [{:keys [refs]}]
+     (js-invoke (aget js/window "VbCohortBuilder") "render" (@refs "cohort-builder-container")))})
 
 (defn render-application []
   (r/render
