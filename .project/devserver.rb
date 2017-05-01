@@ -5,6 +5,7 @@ def start_dev()
   c.status "Starting rsync container..."
   c.sf.start_rsync_container
   at_exit { c.sf.stop_rsync_container }
+  c.status "Performing initial file sync..."
   c.sf.perform_initial_sync
   c.sf.start_watching_sync
   c.status "Watching source files. See log at #{c.sf.log_file_name}."
