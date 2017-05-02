@@ -2,6 +2,7 @@
   (:require
    [dmohs.react :as r]
    [webui.globals :as globals]
+   [webui.style :as style]
    [webui.utils :as u]
    ))
 
@@ -31,7 +32,7 @@
        ;; rather than removing it from the page.
        [:div {:style {:display (when (:hidden? props) "none")
                       :margin-top "2rem"}}
-        [:button {:on-click #(this :-handle-sign-in-click)} "Sign In"]
+        [:button {:style style/button :on-click #(this :-handle-sign-in-click)} "Sign In"]
         (when error-key
           [:div {}
            (if (= error-key :domain)

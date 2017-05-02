@@ -4,6 +4,7 @@
    [webui.auth :as auth]
    [webui.config :as config]
    [webui.globals :as globals]
+   [webui.style :as style]
    ))
 
 (r/defc App
@@ -28,8 +29,10 @@
            (js-invoke (globals/get-profile) "getName")
            " "
            "(" (js-invoke (globals/get-profile) "getEmail") ")"
-           " "
-           [:button {:on-click #(js-invoke (globals/get-auth-instance) "signOut")} "Sign-Out"]])
+           [:div {:style {:margin-top "0.5rem"}}
+            [:button {:style style/button
+                      :on-click #(js-invoke (globals/get-auth-instance) "signOut")}
+             "Sign-Out"]]])
         [:div {:ref "cohort-builder-container" :style {:margin-top "3rem"}}]]))
    :component-did-mount
    (fn [{:keys [this]}]
