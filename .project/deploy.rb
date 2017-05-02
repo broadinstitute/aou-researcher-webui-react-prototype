@@ -61,6 +61,23 @@ def deploy()
   c.run_inline %W{gcloud app deploy --project allofus-164617}
 end
 
+def test_release_image()
+  c = Common.new
+  env = c.load_env
+  unless Dir.exist?("release")
+    c.error "Build release first."
+    exit 1
+  end
+  unless File.exist?("release/config.json")
+    c.error "Configure release first."
+    exit 1
+  end
+  c.status "Building docker image..."
+  c.run_inline %W{docker build -t #{env.namespace} -f Dockerfile .}
+  c.status "Running at http://localhost:3449/ ..."
+  c.run_inline %W{docker run --rm -it -p 3449:8080 #{env.namespace}}
+end
+
 Common.register_command({
   :invocation => "build-for-release",
   :description => "Builds a version of the code suitible for deployment.",
@@ -77,4 +94,11 @@ Common.register_command({
   :invocation => "deploy",
   :description => "Deploys the application to Google App Engine.",
   :fn => Proc.new { |*args| deploy(*args) }
+})
+
+Common.register_command({
+  :invocation => "test-release-image",
+  :description => "Builds a releasable image and runs it as a container. Useful for testing a" \
+    " release.",
+  :fn => Proc.new { |*args| test_release_image(*args) }
 })
