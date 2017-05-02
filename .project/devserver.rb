@@ -1,15 +1,33 @@
 require_relative "common/common"
+require "json"
+
+DEV_CONFIG = {
+  "google-client-id" => "887440561153-pb9gmue2cbbs2gbn9nkr35g0ifpvb8g5.apps.googleusercontent.com",
+}
+
+def write_config()
+  c = Common.new
+  env = c.load_env
+  config = JSON.pretty_generate(DEV_CONFIG)
+  bash_command = "cat > /w/resources/public/config.json"
+  c.pipe(
+    %W{echo #{config}},
+    %W{docker exec -i #{env.namespace}-rsync bash -c #{bash_command}}
+  )
+  c.status "config.json written to container."
+end
 
 def start_dev()
   c = Common.new
+  env = c.load_env
   c.status "Starting rsync container..."
   c.sf.start_rsync_container
   at_exit { c.sf.stop_rsync_container }
   c.status "Performing initial file sync..."
   c.sf.perform_initial_sync
+  write_config
   c.sf.start_watching_sync
   c.status "Watching source files. See log at #{c.sf.log_file_name}."
-  env = c.load_env
   unless c.docker.image_exists?("clojure:rlwrap")
     c.error "Image clojure:rlwrap does not exist. Building..."
     c.run_inline %W{

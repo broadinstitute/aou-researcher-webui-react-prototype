@@ -1,4 +1,9 @@
 require_relative "common/common"
+require "json"
+
+RELEASE_CONFIG = {
+  "google-client-id" => "887440561153-pb9gmue2cbbs2gbn9nkr35g0ifpvb8g5.apps.googleusercontent.com",
+}
 
 def build_for_release()
   c = Common.new
@@ -35,8 +40,23 @@ def build_for_release()
   end
 end
 
+def configure_release()
+  c = Common.new
+  config_file = "release/config.json"
+  File.write(config_file, JSON.pretty_generate(RELEASE_CONFIG) + "\n")
+  c.status "Configuration written to #{config_file}."
+end
+
 def deploy()
   c = Common.new
+  unless Dir.exist?("release")
+    c.error "Build release first."
+    exit 1
+  end
+  unless File.exist?("release/config.json")
+    c.error "Configure release first."
+    exit 1
+  end
   c.status "Deploying to App Engine..."
   c.run_inline %W{gcloud app deploy --project allofus-164617}
 end
@@ -45,6 +65,12 @@ Common.register_command({
   :invocation => "build-for-release",
   :description => "Builds a version of the code suitible for deployment.",
   :fn => Proc.new { |*args| build_for_release(*args) }
+})
+
+Common.register_command({
+  :invocation => "configure-release",
+  :description => "Configures the build for release.",
+  :fn => Proc.new { |*args| configure_release(*args) }
 })
 
 Common.register_command({
