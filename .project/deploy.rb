@@ -58,7 +58,7 @@ def deploy()
     exit 1
   end
   c.status "Deploying to App Engine..."
-  c.run_inline %W{gcloud app deploy --project allofus-164617}
+  c.run_inline %W{gcloud app deploy --project allofus-164617 --quiet}
 end
 
 def test_release_image()
