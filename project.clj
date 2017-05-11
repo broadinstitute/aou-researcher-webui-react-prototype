@@ -1,4 +1,4 @@
-(defproject com.mohsdev.rentals-client "0.0.1"
+(defproject allofus.rp.webui "0.0.1"
   :dependencies
   [
    [dmohs/react "1.1.0+15.4.2-2"]
