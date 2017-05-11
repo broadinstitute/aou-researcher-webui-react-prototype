@@ -4,6 +4,7 @@
    [webui.auth :as auth]
    [webui.config :as config]
    [webui.globals :as globals]
+   [webui.page.cb :as cb]
    [webui.style :as style]
    ))
 
@@ -32,14 +33,13 @@
            [:div {:style {:margin-top "0.5rem"}}
             [:button {:style style/button
                       :on-click #(js-invoke (globals/get-auth-instance) "signOut")}
-             "Sign-Out"]]])
-        [:div {:ref "cohort-builder-container" :style {:margin-top "3rem"}}]]))
-   :component-did-mount
-   (fn [{:keys [this]}]
-     (let [script (js-invoke js/document "createElement" "script")]
-       (js-invoke script "setAttribute" "src" "js/VbCohortBuilder.js")
-       (aset script "onload" #(this :-handle-cohort-builder-loaded))
-       (js-invoke (aget js/document "body") "appendChild" script)))
+             "Sign Out"]]])
+        [:div {:style {:margin-top "3rem"}}
+         [:button {:on-click #(swap! state update :show-cohort-builder? not)}
+          "Toggle Cohort Builder"]
+         (when (:show-cohort-builder? @state)
+           [:div {:style {:margin-top "1rem"}}
+            [cb/CohortBuilder]])]]))
    :-handle-config-loaded
    (fn [{:keys [state]}]
      (swap! state assoc :config-loaded? true))

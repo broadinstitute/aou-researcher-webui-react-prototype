@@ -145,3 +145,16 @@
     (assoc defined-methods
       :component-did-mount did-mount
       :component-will-unmount will-unmount)))
+
+(defn load-script [src on-loaded]
+  (if (nil? (js-invoke js/document "querySelector" (str "script[src=\"" src "\"]")))
+    (let [script (js-invoke js/document "createElement" "script")]
+      (js-invoke script "setAttribute" "src" src)
+      (aset script "onload" on-loaded)
+      (js-invoke (aget js/document "body") "appendChild" script))
+    (on-loaded)))
+
+(defn unload-script [src]
+  (when-let [script (js-invoke js/document "querySelector"
+                               (str "script[src=\"" src "\"]"))]
+    (js-invoke script "remove")))

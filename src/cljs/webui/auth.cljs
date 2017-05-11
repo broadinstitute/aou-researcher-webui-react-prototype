@@ -32,7 +32,17 @@
        ;; rather than removing it from the page.
        [:div {:style {:display (when (:hidden? props) "none")
                       :margin-top "2rem"}}
-        [:button {:style style/button :on-click #(this :-handle-sign-in-click)} "Sign In"]
+        [:div {:style {:display "flex" :align-items "center"}}
+         [:button {:style style/button :on-click #(this :-handle-sign-in-click)}
+          "Sign In"]
+         [:span {:style {:padding-left "1ex"}}
+          "with your " [:strong {} "pmi-ops.org"] " account."]]
+        [:div {:style {:margin-top "1.5rem"}}
+         [:a {:style {:flex "0 10 5rem"}
+              :href "#register"}
+          "Register"]
+         [:span {}
+          " for a " [:strong {} "pmi-ops.org"] " account."]]
         (when error-key
           [:div {}
            (if (= error-key :domain)
