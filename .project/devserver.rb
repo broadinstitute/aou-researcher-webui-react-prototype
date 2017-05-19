@@ -9,10 +9,10 @@ def write_config()
   c = Common.new
   env = c.load_env
   config = JSON.pretty_generate(DEV_CONFIG)
-  bash_command = "cat > /w/resources/public/config.json"
+  sh_command = "cat > /w/resources/public/config.json"
   c.pipe(
     %W{echo #{config}},
-    %W{docker exec -i #{env.namespace}-rsync bash -c #{bash_command}}
+    %W{docker run --rm -i} + c.sf.get_volume_mounts + %W{alpine sh -c #{sh_command}}
   )
   c.status "config.json written to container."
 end
@@ -20,14 +20,9 @@ end
 def start_dev()
   c = Common.new
   env = c.load_env
-  c.status "Starting rsync container..."
-  c.sf.start_rsync_container
-  at_exit { c.sf.stop_rsync_container }
-  c.status "Performing initial file sync..."
-  c.sf.perform_initial_sync
+  c.sf.maybe_start_file_syncing
+  c.status "Writing config to container..."
   write_config
-  c.sf.start_watching_sync
-  c.status "Watching source files. See log at #{c.sf.log_file_name}."
   unless c.docker.image_exists?("clojure:rlwrap")
     c.error "Image clojure:rlwrap does not exist. Building..."
     c.run_inline %W{
@@ -36,16 +31,17 @@ def start_dev()
     }
   end
   c.status "Starting figwheel. Wait for prompt before connecting with a browser..."
-  cmd = "sleep 1; rlwrap lein figwheel"
-  c.run_inline %W{
+  docker_run = %W{
     docker run --name #{env.namespace}-figwheel
       --rm -it
-      -w /w -v #{c.sf.shared_vol}:/w
+      -w /w
       -p 3449:3449
       -v jars:/root/.m2
-      clojure:rlwrap
-      bash -c #{cmd}
   }
+  docker_run += c.sf.get_volume_mounts
+  cmd = "sleep 1; rlwrap lein figwheel"
+  docker_run += %W{clojure:rlwrap bash -c #{cmd}}
+  c.run_inline docker_run
 end
 
 Common.register_command({

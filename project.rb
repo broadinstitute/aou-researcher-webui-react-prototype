@@ -11,6 +11,8 @@ require_relative ".project/devserver"
 
 c = Common.new
 
+c.prefer_version "406d542"
+
 if ARGV.length == 0 or ARGV[0] == "--help"
   c.print_usage
   exit 0
