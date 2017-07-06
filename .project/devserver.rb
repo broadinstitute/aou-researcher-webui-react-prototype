@@ -23,13 +23,6 @@ def start_dev()
   c.sf.maybe_start_file_syncing
   c.status "Writing config to container..."
   write_config
-  unless c.docker.image_exists?("clojure:rlwrap")
-    c.error "Image clojure:rlwrap does not exist. Building..."
-    c.run_inline %W{
-      docker build -t clojure:rlwrap -f src/container/clojure-rlwrap/Dockerfile
-        src/container/clojure-rlwrap
-    }
-  end
   c.status "Starting figwheel. Wait for prompt before connecting with a browser..."
   docker_run = %W{
     docker run --name #{env.namespace}-figwheel
@@ -40,7 +33,7 @@ def start_dev()
   }
   docker_run += c.sf.get_volume_mounts
   cmd = "sleep 1; rlwrap lein figwheel"
-  docker_run += %W{clojure:rlwrap bash -c #{cmd}}
+  docker_run += %W{dmohs/clojurescript bash -c #{cmd}}
   c.run_inline docker_run
 end
 
