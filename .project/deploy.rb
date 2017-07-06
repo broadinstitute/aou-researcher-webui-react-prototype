@@ -9,7 +9,7 @@ def build_for_release()
   c = Common.new
   c.status "Prepping release directory..."
   c.run_inline %W{rm -rf release}
-  c.run_inline %W{mkdir -p release/target}
+  c.run_inline %W{mkdir -p release/www/target}
   c.status "Creating build container..."
   env = c.load_env
   cname = "#{env.namespace}-release-builder"
@@ -17,7 +17,7 @@ def build_for_release()
     docker create --name #{cname}
       -v jars:/root/.m2
       -w /w
-      clojure
+      dmohs/clojurescript
       lein with-profile deploy cljsbuild once
   }
   at_exit { c.run %W{docker rm -f #{cname}} }
@@ -30,19 +30,19 @@ def build_for_release()
   c.status "Building..."
   c.run_inline %W{docker start -a #{cname}}
   c.status "Copying artifacts..."
-  c.run_inline %W{docker cp #{cname}:/w/target/cljsbuild-main.js release/target/compiled.js}
+  c.run_inline %W{docker cp #{cname}:/w/target/cljsbuild-main.js release/www/target/compiled.js}
   c.status "Copying static files..."
   Dir.foreach(env.static_file_src) do |entry|
     unless entry.start_with?(".")
       item = "#{env.static_file_src}/#{entry}"
-      c.run_inline %W{cp -R #{item} release}
+      c.run_inline %W{cp -R #{item} release/www}
     end
   end
 end
 
 def configure_release()
   c = Common.new
-  config_file = "release/config.json"
+  config_file = "release/www/config.json"
   File.write(config_file, JSON.pretty_generate(RELEASE_CONFIG) + "\n")
   c.status "Configuration written to #{config_file}."
 end
@@ -53,12 +53,15 @@ def deploy()
     c.error "Build release first."
     exit 1
   end
-  unless File.exist?("release/config.json")
+  unless File.exist?("release/www/config.json")
     c.error "Configure release first."
     exit 1
   end
+  c.run_inline %W{cp src/appengine/app.yaml release}
   c.status "Deploying to App Engine..."
-  c.run_inline %W{gcloud app deploy --project allofus-164617 --quiet}
+  Dir.chdir("release") do
+    c.run_inline %W{gcloud app deploy --project allofus-164617 --quiet}
+  end
 end
 
 def test_release_image()
