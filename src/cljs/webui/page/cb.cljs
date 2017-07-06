@@ -22,7 +22,7 @@
            (aget js/XMLHttpRequest "prototype" "send"))
      (aset js/XMLHttpRequest "prototype" "send" xhr-force-send-with-credentials)
      (u/load-script
-      "http://35.185.116.214/pmi-cb/VAADIN/vaadinBootstrap.js?v=7.7.5"
+      "https://35.185.116.214/pmi-cb/VAADIN/vaadinBootstrap.js?v=7.7.5"
       #(this :-vaadin-bootstrap-loaded)))
    :component-will-unmount
    (fn []
@@ -39,7 +39,7 @@
       (js-invoke "remove"))
      (-> (js-invoke js/document "getElementById" "ROOT-2521314-overlays")
          (js-invoke "remove"))
-     (u/unload-script "http://35.185.116.214/pmi-cb/VAADIN/vaadinBootstrap.js?v=7.7.5")
+     (u/unload-script "https://35.185.116.214/pmi-cb/VAADIN/vaadinBootstrap.js?v=7.7.5")
      (js-delete js/window "vaadin"))
    :-vaadin-bootstrap-loaded
    (fn []
@@ -73,10 +73,10 @@
                           "message" "Take note of any unsaved data, and <u>click here</u> or press ESC key to continue.",
                           "url" nil
                           },
-          "vaadinDir" "http://35.185.116.214/pmi-cb/VAADIN/",
+          "vaadinDir" "https://35.185.116.214/pmi-cb/VAADIN/",
           "debug" false,
           "standalone" true,
           "heartbeatInterval" 300,
-          "serviceUrl" "http://35.185.116.214/pmi-cb/vaadinServlet/",
-          "browserDetailsUrl" "http://35.185.116.214/pmi-cb/"
+          "serviceUrl" "https://35.185.116.214/pmi-cb/vaadinServlet/",
+          "browserDetailsUrl" "https://35.185.116.214/pmi-cb/"
           }))})
